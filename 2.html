@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html><head><title>関数型勉強会 第2回</title>
+<meta charset="utf-8">
+<script src="http://html5slides.googlecode.com/svn/trunk/slides.js"></script>
+<style></style>
+<style>table.sourceCode,tr.sourceCode,td.lineNumbers,td.sourceCode,table.sourceCode pre{margin:0;padding:0;border:0;vertical-align:baseline;border:none}td.lineNumbers{border-right:1px solid #AAAAAA;text-align:right;color:#AAAAAA;padding-right:5px;padding-left:5px}td.sourceCode{padding-left:5px}code.sourceCode span.kw{color:#007020;font-weight:bold}code.sourceCode span.dt{color:#902000}code.sourceCode span.dv{color:#40a070}code.sourceCode span.bn{color:#40a070}code.sourceCode span.fl{color:#40a070}code.sourceCode span.ch{color:#4070a0}code.sourceCode span.st{color:#4070a0}code.sourceCode span.co{color:#60a0b0;font-style:italic}code.sourceCode span.ot{color:#007020}code.sourceCode span.al{color:red;font-weight:bold}code.sourceCode span.fu{color:#06287e}code.sourceCode span.er{color:red;font-weight:bold}</style>
+</head>
+<body style="display: none"><section class="slides layout-regular "><article><h1>関数型勉強会 第2回</h1>
+<p>Kazuyoshi Osanai</p>
+<p>May 21, 2013</p>
+</article>
+<article><h2>関数</h2>
+</article>
+<article><h3>中置関数</h3>
+<ul><li>一般的な演算子は標準でだいたい定義されています</li>
+<li>負値を扱うときは差と区別するために括弧でくくってください</li>
+</ul>
+<pre><code class="sourceCode haskell">ghci<span class="fu">&gt;</span> <span class="dv">5</span> <span class="fu">/</span> <span class="dv">2</span>
+<span class="fl">2.5</span>
+ghci<span class="fu">&gt;</span> (<span class="dv">50</span> <span class="fu">*</span> <span class="dv">100</span>) <span class="fu">-</span> <span class="dv">4999</span>
+<span class="dv">1</span>
+ghci<span class="fu">&gt;</span> <span class="dv">5</span> <span class="fu">*</span> (<span class="fu">-</span><span class="dv">3</span>)
+<span class="fu">-</span><span class="dv">15</span>
+ghci<span class="fu">&gt;</span> <span class="kw">True</span> <span class="fu">&amp;&amp;</span> <span class="kw">False</span>
+<span class="kw">False</span>
+ghci<span class="fu">&gt;</span> <span class="kw">False</span> <span class="fu">||</span> <span class="kw">True</span>
+<span class="kw">True</span>
+ghci<span class="fu">&gt;</span> <span class="dv">5</span> <span class="fu">==</span> <span class="dv">5</span>
+<span class="kw">True</span>
+ghci<span class="fu">&gt;</span> <span class="dv">5</span> <span class="fu">/=</span> <span class="dv">5</span>
+<span class="kw">False</span></code></pre>
+</article>
+<article><h3>前置関数</h3>
+<ul><li>ほとんどの関数は前置関数です</li>
+<li>中置関数より優先度が高いです</li>
+</ul>
+<pre><code class="sourceCode haskell">ghci<span class="fu">&gt;</span> <span class="fu">succ</span> <span class="dv">4</span> <span class="co">-- 次の値(successor)を返す</span>
+<span class="dv">5</span>
+ghci<span class="fu">&gt;</span> <span class="fu">min</span> <span class="dv">9</span> <span class="dv">10</span>
+<span class="dv">9</span>
+ghci<span class="fu">&gt;</span> <span class="fu">max</span> <span class="fl">3.4</span> <span class="fl">3.2</span>
+<span class="fl">3.4</span>
+ghci<span class="fu">&gt;</span> <span class="fu">succ</span> <span class="dv">9</span> <span class="fu">+</span> <span class="fu">max</span> <span class="dv">5</span> <span class="dv">4</span> <span class="fu">+</span> <span class="dv">1</span>
+<span class="dv">16</span>
+ghci<span class="fu">&gt;</span> (<span class="fu">succ</span> <span class="dv">9</span>) <span class="fu">+</span> (<span class="fu">max</span> <span class="dv">5</span> <span class="dv">4</span>) <span class="fu">+</span> <span class="dv">1</span>
+<span class="dv">16</span></code></pre>
+</article>
+<article><h3>中置と前置の交流</h3>
+<ul><li>中置関数は()でくくると前置関数になります</li>
+<li>前置関数はバッククォートでくくると中置関数になります</li>
+</ul>
+<pre><code class="sourceCode haskell">ghci<span class="fu">&gt;</span> (<span class="fu">/</span>) <span class="dv">5</span> <span class="dv">2</span>
+<span class="fl">2.5</span>
+ghci<span class="fu">&gt;</span> <span class="dv">5</span> <span class="ot">`mod`</span> <span class="dv">2</span>
+<span class="dv">1</span></code></pre>
+</article>
+<article><h3>関数の定義1</h3>
+<ul><li>ファイル<code>baby.hs</code>
+に次のコードをタイプしてください</li>
+<li><code>doubleMe x = x + x</code>
+</li>
+<li>そしたら<code>GHCi</code>
+でロードしてください</li>
+</ul>
+<pre><code class="sourceCode haskell">ghci<span class="fu">&gt;</span> <span class="fu">:</span>l baby
+ghci<span class="fu">&gt;</span> doubleMe <span class="dv">9</span>
+ghci<span class="fu">&gt;</span> doubleMe <span class="fl">8.3</span></code></pre>
+</article>
+<article><h3>関数の定義2</h3>
+<ul><li>ファイルに次の関数を追記して同様にやってみましょう</li>
+<li><code>doubleUs x y = x * 2 + y * 2</code>
+</li>
+</ul>
+<pre><code class="sourceCode haskell">ghci<span class="fu">&gt;</span> <span class="fu">:</span>l baby
+ghci<span class="fu">&gt;</span> doubleUs <span class="dv">4</span> <span class="dv">9</span>
+ghci<span class="fu">&gt;</span> doubleUs <span class="dv">28</span> <span class="dv">88</span> <span class="fu">+</span> doubleMe <span class="dv">123</span></code></pre>
+</article>
+<article><h3><code>if-then-else</code>
+式</h3>
+<ul><li><code>if</code>
+は値を返します</li>
+<li><code>else</code>
+は必須です</li>
+</ul>
+<pre><code class="sourceCode haskell">doubleSmallNumber x <span class="fu">=</span> <span class="kw">if</span> x <span class="fu">&gt;</span> <span class="dv">100</span>
+                        <span class="kw">then</span> x
+                        <span class="kw">else</span> x <span class="fu">*</span> <span class="dv">2</span></code></pre>
+</article>
+<article><h3>関数に使える文字</h3>
+<ul><li>アポストロフィも使えます</li>
+<li>既存の関数の変種や正格版を表すのによく使います</li>
+<li>引数を取らない関数は定義とか名前と呼びます</li>
+</ul>
+<pre><code class="sourceCode haskell">doubleSmallNumber&#39; x <span class="fu">=</span> (<span class="kw">if</span> x <span class="fu">&gt;</span> <span class="dv">100</span> <span class="kw">then</span> x <span class="kw">else</span> x<span class="fu">*</span><span class="dv">2</span>) <span class="fu">+</span> <span class="dv">1</span>
+
+conanO&#39;Brien <span class="fu">=</span> <span class="st">&quot;It&#39;s a-me, Conan O&#39;Brien!&quot;</span></code></pre>
+</article>
+<article><h2>リスト</h2>
+</article>
+<article><h3>リスト入門</h3>
+<ul><li>一様なデータ構造です<ul><li>同じ型の値のみ入ります</li>
+</ul>
+</li>
+</ul>
+<pre><code class="sourceCode haskell">ghci<span class="fu">&gt;</span> <span class="kw">let</span> lostNumbers <span class="fu">=</span> [<span class="dv">4</span>,<span class="dv">8</span>,<span class="dv">15</span>,<span class="dv">16</span>,<span class="dv">23</span>,<span class="dv">42</span>]
+ghci<span class="fu">&gt;</span> lostNumbers
+[<span class="dv">4</span>,<span class="dv">8</span>,<span class="dv">15</span>,<span class="dv">16</span>,<span class="dv">23</span>,<span class="dv">42</span>]</code></pre>
+</article>
+<article><h3>リストの連結</h3>
+<ul><li><p>リストどうしの連結は<code>++</code>
+を使います</p>
+</li>
+<li>先頭への1つの要素の追加は<code>:</code>
+を使います<ul><li>cons演算子とも呼ばれます</li>
+<li>速いです(O(1))</li>
+</ul>
+</li>
+</ul>
+<pre><code class="sourceCode haskell">ghci<span class="fu">&gt;</span> [<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>] <span class="fu">++</span> [<span class="dv">8</span>,<span class="dv">9</span>,<span class="dv">10</span>]
+[<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">8</span>,<span class="dv">9</span>,<span class="dv">10</span>]
+ghci<span class="fu">&gt;</span> <span class="ch">&#39;A&#39;</span> <span class="fu">:</span> <span class="st">&quot; SMALL CAT&quot;</span> <span class="co">-- 文字列は文字のリスト</span>
+<span class="st">&quot;A SMALL CAT&quot;</span></code></pre>
+<ul><li>練習問題: リスト末尾への1つの要素の追加はどう書けますか?</li>
+</ul>
+</article>
+<article><h3>要素へのアクセス</h3>
+<ul><li>先頭からの位置で要素を取得したいときは<code>!!</code>
+を使います</li>
+<li>範囲外の位置を指定すると...</li>
+</ul>
+<pre><code class="sourceCode haskell">ghci<span class="fu">&gt;</span> <span class="st">&quot;Sugoi Haskell&quot;</span> <span class="fu">!!</span> <span class="dv">6</span>
+<span class="ch">&#39;H&#39;</span></code></pre>
+</article>
+<article><h3>リストのリスト</h3>
+<ul><li>リストにはリストを含めることができます</li>
+</ul>
+<pre><code class="sourceCode haskell">ghci<span class="fu">&gt;</span> <span class="kw">let</span> b <span class="fu">=</span> [<span class="st">&quot;Hello&quot;</span>,<span class="st">&quot;,&quot;</span>] <span class="co">-- ghciで名前を定義するときはletを使います</span>
+ghci<span class="fu">&gt;</span> b <span class="fu">++</span> [<span class="st">&quot;World&quot;</span>]
+[<span class="st">&quot;Hello&quot;</span>,<span class="st">&quot;,&quot;</span>,<span class="st">&quot;World&quot;</span>]</code></pre>
+</article>
+<article><h3>リストの比較</h3>
+<ul><li>辞書順で比較されます</li>
+</ul>
+<pre><code class="sourceCode haskell">ghci<span class="fu">&gt;</span> [<span class="dv">3</span>,<span class="dv">2</span>,<span class="dv">1</span>] <span class="fu">&gt;</span> [<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">0</span>]
+<span class="kw">True</span>
+ghci<span class="fu">&gt;</span> [<span class="dv">3</span>,<span class="dv">2</span>,<span class="dv">1</span>] <span class="fu">&gt;</span> [<span class="dv">2</span>,<span class="dv">10</span>,<span class="dv">100</span>]
+<span class="kw">True</span>
+ghci<span class="fu">&gt;</span> [<span class="dv">3</span>,<span class="dv">4</span>,<span class="dv">2</span>] <span class="fu">&gt;</span> [<span class="dv">2</span>,<span class="dv">4</span>]
+<span class="kw">True</span></code></pre>
+</article>
+<article><h3>さらなるリスト操作</h3>
+<pre><code class="sourceCode haskell">ghci<span class="fu">&gt;</span> <span class="fu">head</span> [<span class="dv">5</span>,<span class="dv">4</span>,<span class="dv">3</span>] <span class="fu">-</span> 先頭を返す
+<span class="dv">5</span>
+ghci<span class="fu">&gt;</span> <span class="fu">tail</span> [<span class="dv">5</span>,<span class="dv">4</span>,<span class="dv">3</span>] <span class="fu">-</span> 先頭を除いた部分を返す
+[<span class="dv">4</span>,<span class="dv">3</span>]
+ghci<span class="fu">&gt;</span> <span class="fu">last</span> [<span class="dv">5</span>,<span class="dv">4</span>,<span class="dv">3</span>] <span class="fu">-</span> 末尾を返す
+<span class="dv">3</span>
+ghci<span class="fu">&gt;</span> <span class="fu">init</span> [<span class="dv">5</span>,<span class="dv">4</span>,<span class="dv">3</span>] <span class="fu">-</span> 末尾以外を返す
+[<span class="dv">5</span>,<span class="dv">4</span>]
+ghci<span class="fu">&gt;</span> <span class="fu">length</span> [<span class="dv">5</span>,<span class="dv">4</span>,<span class="dv">3</span>] <span class="fu">-</span> 長さを返す
+<span class="dv">3</span>
+ghci<span class="fu">&gt;</span> <span class="fu">null</span> [] <span class="fu">-</span> 空か判定する
+<span class="kw">True</span>
+ghci<span class="fu">&gt;</span> <span class="fu">reverse</span> [<span class="dv">5</span>,<span class="dv">4</span>,<span class="dv">3</span>] <span class="fu">-</span> 反転する
+[<span class="dv">3</span>,<span class="dv">4</span>,<span class="dv">5</span>]
+ghci<span class="fu">&gt;</span> <span class="fu">maximum</span> [<span class="dv">5</span>,<span class="dv">4</span>,<span class="dv">3</span>] <span class="fu">-</span> 最大を返す
+<span class="dv">5</span>
+ghci<span class="fu">&gt;</span> <span class="fu">minimum</span> [<span class="dv">5</span>,<span class="dv">4</span>,<span class="dv">3</span>] <span class="fu">-</span> 最小を返す
+<span class="dv">3</span></code></pre>
+</article>
+<article><h3>レンジ</h3>
+<ul><li>範囲を列挙したリストを作れます</li>
+<li>等差数列を作れます</li>
+</ul>
+<pre><code class="sourceCode haskell">ghci<span class="fu">&gt;</span> [<span class="dv">1</span><span class="fu">..</span><span class="dv">20</span>]
+[<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>,<span class="dv">5</span>,<span class="dv">6</span>,<span class="dv">7</span>,<span class="dv">8</span>,<span class="dv">9</span>,<span class="dv">10</span>,<span class="dv">11</span>,<span class="dv">12</span>,<span class="dv">13</span>,<span class="dv">14</span>,<span class="dv">15</span>,<span class="dv">16</span>,<span class="dv">17</span>,<span class="dv">18</span>,<span class="dv">19</span>,<span class="dv">20</span>]
+ghci<span class="fu">&gt;</span> [<span class="ch">&#39;a&#39;</span><span class="fu">..</span><span class="ch">&#39;z&#39;</span>]
+<span class="st">&quot;abcdefghijklmnopqrstuvwxyz&quot;</span>
+ghci<span class="fu">&gt;</span> [<span class="dv">3</span>,<span class="dv">6</span><span class="fu">..</span><span class="dv">20</span>]
+[<span class="dv">3</span>,<span class="dv">6</span>,<span class="dv">9</span>,<span class="dv">12</span>,<span class="dv">15</span>,<span class="dv">18</span>]</code></pre>
+</article>
+<article><h3>無限も可</h3>
+<ul><li><code>take n list</code>
+はlistから先頭のn個を抜き出します</li>
+</ul>
+<pre><code class="sourceCode haskell">ghci<span class="fu">&gt;</span> <span class="fu">take</span> <span class="dv">10</span> [<span class="dv">1</span><span class="fu">..</span>]
+[<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>,<span class="dv">5</span>,<span class="dv">6</span>,<span class="dv">7</span>,<span class="dv">8</span>,<span class="dv">9</span>,<span class="dv">10</span>]
+ghci<span class="fu">&gt;</span> [<span class="dv">1</span><span class="fu">..</span>]
+<span class="co">-- 終わらない出力</span></code></pre>
+</article>
+<article><h3>リスト内包表記</h3>
+<!--
+## 練習問題
+
+1. 以下の式の型は何か．まずは`:t`を使わずに考えよ．
+
+- `False`
+- `(["foo", "bar"], 'a')`
+- `[(True, []), (False, [['a']])]`
+-->
+</article>
+<article><h3>練習問題</h3>
+<ol><li><p><code>lastButOne</code>
+ という関数を書きなさい． この関数は最後の1つ前の要素を返す関数です．</p>
+</li>
+<li><p><code>lastButOne</code>
+ をghciにロードして， いろいろな長さのリストについて試してみなさい． 短すぎるリストを渡すとどうなりますか．</p>
+</li>
+</ol>
+</article>
+<article><h3>練習問題</h3>
+<ol><li><p>リストの要素数を数える関数を書きなさい． 書いたものをテストするには標準関数<code>length</code>
+と同じ答えを返すことを確かめなさい．</p>
+</li>
+<li><p>ソースファイルに1で作った関数の型シグネチャを追加しなさい． これをテストするにはそのソースファイルを再度<code>ghci</code>
+にロードしなさい．</p>
+</li>
+<li><p>リストの平均値を計算する関数を書きなさい． リストの平均値とは，すべての要素の和をリストの長さで割ったものです． (整数を浮動小数点に変換する<code>fromIntegral</code>
+を使います)</p>
+</li>
+</ol>
+</article>
+<article><h3>練習問題</h3>
+<ol><li><p>リストを回文にしなさい．回文とは前から読んでも後ろから読んでも同じになるリストです．(たとえば<code>[1,2,3]</code>
+→<code>[1,2,3,3,2,1]</code>
+となります)</p>
+</li>
+<li><p>入力したリストが回文かどうか判定する関数を書きなさい．</p>
+</li>
+<li><p>リストのリストをサブリストの長さでソートする関数を書きなさい． (<code>Data.List</code>
+の<code>sortBy</code>
+を調べるとよいでしょう)</p>
+</li>
+</ol>
+</article>
+<article><h3>練習問題</h3>
+<ol><li>区切りになる値を使ってリストのリストを連結する関数を定義しなさい．</li>
+</ol>
+<ul><li><code>intersperse :: a -&gt; [[a]] -&gt; [a]</code>
+</li>
+<li><code>ghci&gt; intersperse &#39;,&#39; [&quot;foo&quot;]</code>
+</li>
+<li><code>&quot;foo&quot;</code>
+</li>
+<li><code>ghci&gt; intersperse &#39;,&#39; [&quot;foo&quot;,&quot;bar&quot;,&quot;baz&quot;]</code>
+</li>
+<li><code>&quot;foo,bar,baz&quot;</code>
+</li>
+</ul>
+<!-- 
+# ツカミ
+
+## Haskell Popular Introduction
+
+- Haskellの紹介にはクイックソートがよく使われる
+
+~~~ {.haskell}
+quicksort :: Ord a => [a] -> [a]
+quicksort [] = []
+quicksort (x:xs) = smaller ++ [x] ++ greater
+  where smaller = quicksort [y | y<-xs, y<=x]
+        greater = quicksort [y | y<-xs, y>x]
+
+-- Main> quicksort [3,2,1,5,4,6,8,7,9]
+-- [1,2,3,4,5,6,7,8,9]
+~~~
+
+# 初回なので活動方針を決めます
+
+## 関数型勉強会について
+
+- 関数型言語という技術について勉強会を行います
+- 去年から開催
+    + 去年はScala本の読書会を実施
+- 今年は<span class="green">Haskell</span>をやります
+- 関数型勉強会と銘打っていますが，もっぱら「静的型付け関数型言語」を取り扱います
+    + 動的型付けを期待された向きはすみません
+
+## 関数型班について
+
+- 文化祭に向け，関数型言語を使って<span class="green">なにか</span>を作ります
+- 作るものの方針はとくに定めていません
+- 過去に作ったもの
+    + フラクタル図形生成
+    + 迷路生成
+    + オセロゲームWebアプリ
+- 班に所属しなくても勉強会は参加できます
+
+## 成果物
+
+<object type="image/svg+xml" data="tut0.svg" width="460px"></object>
+
+<img src="othello_capture.png" width="300px">
+
+## 活動日
+
+- 毎週金曜日18:00から，1,2時間くらい...
+
+> - の予定でしたが意見があったので変更します
+
+## 使う本
+
+<img src="sugoi.gif" align="right" width="250" border="1px solid">
+
+- <span class="green">「すごいHaskellたのしく学ぼう!」</span>
+- 物理書籍 ￥2,800
+- 電子書籍 ￥2,240
+
+# 余談
+
+## 余談
+
+- このスライドはHaskellで生成されています
+- 汎用ドキュメント変換ツール<span class="green">Pandoc</span>
+    + Markdown → PDFとか，LaTeX → DOCXとかできる
+- Pandocを用いてHTML5スライドを生成する<span class="green">pandoc-html5slide</span>
+    + 「すごいHaskellたのしく学ぼう！」の訳者tanakhさん作
+
+# 環境構築タイム
+
+## 環境構築
+
+- ノートPCある人
+    + Haskell環境を用意したPCを持ってきてください
+    + 「Haskell Platform」で検索
+    + Unix環境では「cabal-install」も必要かも
+
+- ノートPCない人
+    + 梅村研究室のPCを使わせてもらう予定
+    + 次回まで私が用意します(多分)
+
+# 関数型言語についての私の見方
+
+## 関数型言語とは
+
+- 関数型言語は定義があいまいな言葉です
+- ここでは「<span class="green">関数プログラミングスタイル</span>をサポートするもの」とします
+
+## 関数プログラミングスタイル
+
+- プログラミングの際に関数という単位を重視・酷使する
+
+- そのために以下の要素をよく使う
+    + ファーストクラス関数
+    + 高階関数
+
+- 副作用を持つ関数とそうでない関数を分離する傾向
+
+# 終わりに
+
+## 終わりに
+
+- 関数型言語はこわくない
+    + 関数型以外の言語をやった人は関数型言語の理解も早いらしいです
+    + 「言語設計者たちが考えること」って本に書いてありました
+
+- 使わなくても役にたつ
+    + 関数型というパラダイムを知っておと，他の言語を使うときでも役立ちます(経験談)
+
+- 以後よろしくお願いします
+-->
+
+</article>
+</section>
+</body>
+</html>
