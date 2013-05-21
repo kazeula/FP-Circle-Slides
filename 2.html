@@ -188,7 +188,14 @@ ghci<span class="fu">&gt;</span> [<span class="dv">3</span>,<span class="dv">6</
 ghci<span class="fu">&gt;</span> [<span class="dv">1</span><span class="fu">..</span>]
 <span class="co">-- 終わらない出力</span></code></pre>
 </article>
-<article><h3>リスト内包表記</h3>
+<article><h3>リストを受け取る関数</h3>
+<ul><li><span class="green">パターンマッチ</span>で先頭とそれ以外に分離して受け取ります</li>
+<li>反復処理は再帰でなんとかします</li>
+</ul>
+<pre><code class="sourceCode haskell">isIncludeK [] <span class="fu">=</span> <span class="kw">False</span>
+isIncludeK (x<span class="fu">:</span>xs) <span class="fu">=</span> <span class="kw">if</span> x <span class="fu">==</span> <span class="ch">&#39;K&#39;</span> 
+                      <span class="kw">then</span> <span class="kw">True</span> 
+                      <span class="kw">else</span> isIncludeK xs</code></pre>
 <!--
 ## 練習問題
 
