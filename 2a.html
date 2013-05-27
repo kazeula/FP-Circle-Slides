@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html><head><title>関数型勉強会 第2回 解答</title>
+<meta charset="utf-8">
+<script src="http://html5slides.googlecode.com/svn/trunk/slides.js"></script>
+<style></style>
+<style>table.sourceCode,tr.sourceCode,td.lineNumbers,td.sourceCode,table.sourceCode pre{margin:0;padding:0;border:0;vertical-align:baseline;border:none}td.lineNumbers{border-right:1px solid #AAAAAA;text-align:right;color:#AAAAAA;padding-right:5px;padding-left:5px}td.sourceCode{padding-left:5px}code.sourceCode span.kw{color:#007020;font-weight:bold}code.sourceCode span.dt{color:#902000}code.sourceCode span.dv{color:#40a070}code.sourceCode span.bn{color:#40a070}code.sourceCode span.fl{color:#40a070}code.sourceCode span.ch{color:#4070a0}code.sourceCode span.st{color:#4070a0}code.sourceCode span.co{color:#60a0b0;font-style:italic}code.sourceCode span.ot{color:#007020}code.sourceCode span.al{color:red;font-weight:bold}code.sourceCode span.fu{color:#06287e}code.sourceCode span.er{color:red;font-weight:bold}</style>
+</head>
+<body style="display: none"><section class="slides layout-regular "><article><h1>関数型勉強会 第2回 解答</h1>
+<p>Kazuyoshi Osanai</p>
+<p>May 21, 2013</p>
+</article>
+<article><h3>1ページ目</h3>
+<pre><code class="sourceCode haskell">lastButOne xs <span class="fu">=</span> <span class="fu">last</span> (<span class="fu">init</span> xs)</code></pre>
+</article>
+<article><h3>2ページ目</h3>
+<pre><code class="sourceCode haskell"><span class="ot">myLength ::</span> [a] <span class="ot">-&gt;</span> <span class="dt">Int</span>
+myLength xs <span class="fu">=</span> <span class="kw">if</span> <span class="fu">null</span> xs
+                <span class="kw">then</span> <span class="dv">0</span>
+                <span class="kw">else</span> <span class="dv">1</span> <span class="fu">+</span> myLength (<span class="fu">tail</span> xs)
+
+<span class="ot">mySum ::</span> (<span class="kw">Num</span> a) <span class="ot">=&gt;</span> [a] <span class="ot">-&gt;</span> a
+mySum xs <span class="fu">=</span> <span class="kw">if</span> <span class="fu">null</span> xs
+             <span class="kw">then</span> <span class="dv">0</span>
+             <span class="kw">else</span> <span class="fu">head</span> xs <span class="fu">+</span> mySum (<span class="fu">tail</span> xs)
+
+<span class="ot">myAverage ::</span> (<span class="kw">Fractional</span> a) <span class="ot">=&gt;</span> [a] <span class="ot">-&gt;</span> a
+myAverage xs <span class="fu">=</span> mySum xs <span class="fu">/</span> (<span class="fu">fromIntegral</span> (myLength xs))</code></pre>
+</article>
+<article><h3>3ページ目(1/2)</h3>
+<pre><code class="sourceCode haskell"><span class="ot">palindrome ::</span> [a] <span class="ot">-&gt;</span> [a]
+palindrome xs <span class="fu">=</span> <span class="kw">if</span> <span class="fu">null</span> xs 
+                  <span class="kw">then</span> [] 
+                  <span class="kw">else</span> [<span class="fu">head</span> xs] <span class="fu">++</span> palindrome (<span class="fu">tail</span> xs) <span class="fu">++</span> [<span class="fu">head</span> xs]
+
+<span class="ot">isPalindrome ::</span> (<span class="kw">Eq</span> a) <span class="ot">=&gt;</span> [a] <span class="ot">-&gt;</span> <span class="dt">Bool</span>
+isPalindrome xs <span class="fu">=</span> <span class="kw">if</span> <span class="fu">length</span> xs <span class="fu">&lt;=</span> <span class="dv">1</span>
+                    <span class="kw">then</span> <span class="kw">True</span>
+                    <span class="kw">else</span> <span class="kw">if</span> (<span class="fu">head</span> xs) <span class="fu">/=</span> (<span class="fu">last</span> xs) 
+                      <span class="kw">then</span> <span class="kw">False</span> 
+                      <span class="kw">else</span> isPalindrome (<span class="fu">init</span> (<span class="fu">tail</span> xs))</code></pre>
+</article>
+<article><h3>3ページ目(2/2)</h3>
+<pre><code class="sourceCode haskell"><span class="kw">import</span> <span class="dt">Data.List</span>(sortBy)
+
+<span class="ot">sublistOrder ::</span> [a] <span class="ot">-&gt;</span> [a] <span class="ot">-&gt;</span> <span class="dt">Ordering</span>
+sublistOrder xs ys <span class="fu">=</span> <span class="kw">if</span> <span class="fu">length</span> xs <span class="fu">&lt;</span> <span class="fu">length</span> ys 
+                       <span class="kw">then</span> <span class="kw">LT</span>
+                       <span class="kw">else</span> <span class="kw">if</span> <span class="fu">length</span> xs <span class="fu">==</span> <span class="fu">length</span> ys
+                         <span class="kw">then</span> <span class="kw">EQ</span>
+                         <span class="kw">else</span> <span class="kw">GT</span>
+
+<span class="ot">sortBySublength ::</span> [[a]] <span class="ot">-&gt;</span> [[a]]
+sortBySublength xs <span class="fu">=</span> sortBy sublistOrder xs</code></pre>
+</article>
+<article><h3>4ページ目</h3>
+<pre><code class="sourceCode haskell"><span class="ot">intersperse ::</span> a <span class="ot">-&gt;</span> [[a]] <span class="ot">-&gt;</span> [a]
+intersperse x ys <span class="fu">=</span> <span class="kw">if</span> <span class="fu">length</span> ys <span class="fu">==</span> <span class="dv">1</span>
+                     <span class="kw">then</span> <span class="fu">head</span> ys
+                     <span class="kw">else</span> <span class="fu">head</span> ys <span class="fu">++</span> [x] <span class="fu">++</span> intersperse x (<span class="fu">tail</span> ys)</code></pre>
+</article>
+</section>
+</body>
+</html>
