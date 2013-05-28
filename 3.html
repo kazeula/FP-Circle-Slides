@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html><head><title>関数型勉強会 第3回</title>
+<meta charset="utf-8">
+<script src="http://html5slides.googlecode.com/svn/trunk/slides.js"></script>
+<style></style>
+<style>table.sourceCode,tr.sourceCode,td.lineNumbers,td.sourceCode,table.sourceCode pre{margin:0;padding:0;border:0;vertical-align:baseline;border:none}td.lineNumbers{border-right:1px solid #AAAAAA;text-align:right;color:#AAAAAA;padding-right:5px;padding-left:5px}td.sourceCode{padding-left:5px}code.sourceCode span.kw{color:#007020;font-weight:bold}code.sourceCode span.dt{color:#902000}code.sourceCode span.dv{color:#40a070}code.sourceCode span.bn{color:#40a070}code.sourceCode span.fl{color:#40a070}code.sourceCode span.ch{color:#4070a0}code.sourceCode span.st{color:#4070a0}code.sourceCode span.co{color:#60a0b0;font-style:italic}code.sourceCode span.ot{color:#007020}code.sourceCode span.al{color:red;font-weight:bold}code.sourceCode span.fu{color:#06287e}code.sourceCode span.er{color:red;font-weight:bold}</style>
+</head>
+<body style="display: none"><section class="slides layout-regular "><article><h1>関数型勉強会 第3回</h1>
+<p>Kazuyoshi Osanai</p>
+<p>May 28, 2013</p>
+</article>
+<article><!-- 
+# ツカミ 
+-->
+</article>
+<article><h2>リストの続き</h2>
+</article>
+<article><h3>さらなる無限リスト</h3>
+<ul><li>Haskell は<span class="green">遅延評価(Lazy)</span>な言語なので， 無限リストを自然に扱えます</li>
+<li>正格評価(Eager)言語でも無限リストが用意されていることはありますが， 特別な扱い方が必要なことが多いです<ul><li>Scala の遅延ストリームとか</li>
+</ul>
+</li>
+</ul>
+<pre><code class="sourceCode haskell">ghci<span class="fu">&gt;</span> <span class="fu">take</span> <span class="dv">10</span> (<span class="fu">cycle</span> [<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>])
+[<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">1</span>]
+ghci<span class="fu">&gt;</span> <span class="fu">take</span> <span class="dv">10</span> (<span class="fu">repeat</span> <span class="dv">5</span>)
+[<span class="dv">5</span>,<span class="dv">5</span>,<span class="dv">5</span>,<span class="dv">5</span>,<span class="dv">5</span>,<span class="dv">5</span>,<span class="dv">5</span>,<span class="dv">5</span>,<span class="dv">5</span>,<span class="dv">5</span>]
+ghci<span class="fu">&gt;</span> <span class="fu">replicate</span> <span class="dv">3</span> <span class="dv">10</span>
+[<span class="dv">10</span>,<span class="dv">10</span>,<span class="dv">10</span>]</code></pre>
+</article>
+<article><h3>リスト内包表記</h3>
+<ul><li>リストの<ul><li>フィルタリング</li>
+<li>変換</li>
+<li>組み合わせ<br>
+を1度に行います</li>
+</ul>
+</li>
+<li>数学の集合っぽいイメージ</li>
+</ul>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" title="{ 2 \cdot x | x \in N, x \leq 10 }&#13;&#9;&#9;&#9;&#9;&#9;&#9;&#9; "><mrow><mi>{</mi><mn>2</mn><mo>⋅</mo><mi>x</mi><mo>|</mo><mi>x</mi><mo>∊</mo><mi>N</mi><mo>,</mo><mi>x</mi><mo>≤</mo><mn>10</mn><mi>}</mi><mi></mi><mi> </mi><mi> </mi><mi> </mi><mi> </mi><mi> </mi><mi> </mi><mi> </mi></mrow></math></p>
+<pre><code class="sourceCode haskell">ghci<span class="fu">&gt;</span> [ <span class="dv">2</span><span class="fu">*</span>x <span class="fu">|</span> x <span class="ot">&lt;-</span> [<span class="dv">1</span><span class="fu">..</span><span class="dv">10</span>] ]
+[<span class="dv">2</span>,<span class="dv">4</span>,<span class="dv">6</span>,<span class="dv">8</span>,<span class="dv">10</span>,<span class="dv">12</span>,<span class="dv">14</span>,<span class="dv">16</span>,<span class="dv">18</span>,<span class="dv">20</span>]</code></pre>
+</article>
+<article><h3>続・リスト内包表記</h3>
+<ul><li>縦棒の左側にマッピング処理を書き，右側に条件を書きます</li>
+<li>複数の条件はカンマで区切ります</li>
+</ul>
+<pre><code class="sourceCode haskell">ghci<span class="fu">&gt;</span> [ <span class="dv">2</span><span class="fu">*</span>x <span class="fu">|</span> x <span class="ot">&lt;-</span> [<span class="dv">1</span><span class="fu">..</span><span class="dv">10</span>] ]
+[<span class="dv">2</span>,<span class="dv">4</span>,<span class="dv">6</span>,<span class="dv">8</span>,<span class="dv">10</span>,<span class="dv">12</span>,<span class="dv">14</span>,<span class="dv">16</span>,<span class="dv">18</span>,<span class="dv">20</span>]
+ghci<span class="fu">&gt;</span> [ x <span class="fu">|</span> x<span class="ot">&lt;-</span>[<span class="dv">1</span><span class="fu">..</span><span class="dv">100</span>], x<span class="ot">`mod`</span><span class="dv">3</span><span class="fu">==</span><span class="dv">0</span>, x<span class="ot">`mod`</span><span class="dv">5</span><span class="fu">==</span><span class="dv">0</span> ]
+[<span class="dv">15</span>,<span class="dv">30</span>,<span class="dv">45</span>,<span class="dv">60</span>,<span class="dv">75</span>,<span class="dv">90</span>]
+ghci<span class="fu">&gt;</span> [ x<span class="fu">*</span>y <span class="fu">|</span> x<span class="ot">&lt;-</span>[<span class="dv">1</span>,<span class="dv">3</span><span class="fu">..</span><span class="dv">10</span>], y<span class="ot">&lt;-</span>[<span class="dv">2</span>,<span class="dv">4</span><span class="fu">..</span><span class="dv">10</span>] ]
+[<span class="dv">2</span>,<span class="dv">4</span>,<span class="dv">6</span>,<span class="dv">8</span>,<span class="dv">10</span>,<span class="dv">6</span>,<span class="dv">12</span>,<span class="dv">18</span>,<span class="dv">24</span>,<span class="dv">30</span>,<span class="dv">10</span>,<span class="dv">20</span>,<span class="dv">30</span>,<span class="dv">40</span>,<span class="dv">50</span>,<span class="dv">14</span>,<span class="dv">28</span>,<span class="dv">42</span>,<span class="dv">56</span>,<span class="dv">70</span>,<span class="dv">18</span>,<span class="dv">36</span>,<span class="dv">54</span>,<span class="dv">72</span>,<span class="dv">90</span>]</code></pre>
+<pre><code class="sourceCode haskell">ghci<span class="fu">&gt;</span> [ (x,y) <span class="fu">|</span> x<span class="ot">&lt;-</span>[<span class="dv">1</span><span class="fu">..</span><span class="dv">15</span>], y<span class="ot">&lt;-</span>[<span class="st">&quot;Fizz&quot;</span>, <span class="st">&quot;Buzz&quot;</span>,<span class="st">&quot;FizzBuzz&quot;</span>],\
+           x<span class="ot">`mod`</span><span class="dv">3</span><span class="fu">==</span><span class="dv">0</span> <span class="fu">&amp;&amp;</span> x<span class="ot">`mod`</span><span class="dv">5</span><span class="fu">==</span><span class="dv">0</span> <span class="fu">&amp;&amp;</span> y<span class="fu">==</span><span class="st">&quot;FizzBuzz&quot;</span> 
+        <span class="fu">||</span> x<span class="ot">`mod`</span><span class="dv">3</span><span class="fu">==</span><span class="dv">0</span> <span class="fu">&amp;&amp;</span> y<span class="fu">==</span><span class="st">&quot;Fizz&quot;</span> 
+        <span class="fu">||</span> x <span class="ot">`mod`</span><span class="dv">5</span><span class="fu">==</span><span class="dv">0</span> <span class="fu">&amp;&amp;</span> y<span class="fu">==</span><span class="st">&quot;Buzz&quot;</span> ]
+[(<span class="dv">3</span>,<span class="st">&quot;Fizz&quot;</span>),(<span class="dv">5</span>,<span class="st">&quot;Buzz&quot;</span>),(<span class="dv">6</span>,<span class="st">&quot;Fizz&quot;</span>),(<span class="dv">9</span>,<span class="st">&quot;Fizz&quot;</span>),(<span class="dv">10</span>,<span class="st">&quot;Buzz&quot;</span>),(<span class="dv">12</span>,<span class="st">&quot;Fizz&quot;</span>),(<span class="dv">15</span>,<span class="st">&quot;Fizz&quot;</span>),(<span class="dv">15</span>,<span class="st">&quot;Buzz&quot;</span>),(<span class="dv">15</span>,<span class="st">&quot;FizzBuzz&quot;</span>)]</code></pre>
+<!-- ## 練習問題
+
+1. リスト内包表記を用いて -->
+</article>
+<article><h2>タプル</h2>
+</article>
+<article><h3>タプル</h3>
+<ul><li>複数の値の組を表すとき<span class="green">タプル</span>を使います</li>
+<li>リストと似ています</li>
+<li>リストと違うところは，型レベルで要素数が制限されていること，複数の型を持てることなどです</li>
+</ul>
+<pre><code class="sourceCode haskell">ghci<span class="fu">&gt;</span> (<span class="dv">1</span>,<span class="dv">3</span>)
+(<span class="dv">1</span>,<span class="dv">3</span>)
+ghci<span class="fu">&gt;</span> (<span class="dv">1</span>,<span class="dv">2</span>,<span class="ch">&#39;a&#39;</span>)
+(<span class="dv">1</span>,<span class="dv">2</span>,<span class="ch">&#39;a&#39;</span>)
+ghci<span class="fu">&gt;</span> <span class="fu">:</span>t (<span class="dv">1</span>,<span class="dv">2</span>,<span class="ch">&#39;a&#39;</span>)
+(<span class="dv">1</span>,<span class="dv">2</span>,<span class="ch">&#39;a&#39;</span>)<span class="ot"> ::</span> (<span class="kw">Num</span> t1, <span class="kw">Num</span> t) <span class="ot">=&gt;</span> (t, t1, <span class="dt">Char</span>)</code></pre>
+</article>
+<article><h3>続・タプル</h3>
+<ul><li>要素数が2のタプルを，<span class="green">ダブル</span>といったり<span class="green">ペア</span>といったりします</li>
+<li>ペアに対しては値を取り出す関数が用意されています<ul><li>要素が3つ以上のタプルからの値の取り出し方は後述</li>
+</ul>
+</li>
+<li>含む型が1つでも違うと区別されます</li>
+</ul>
+<pre><code class="sourceCode haskell">ghci<span class="fu">&gt;</span> <span class="fu">fst</span> (<span class="dv">1</span>,<span class="dv">2</span>)
+<span class="dv">1</span>
+ghci<span class="fu">&gt;</span> <span class="fu">snd</span> (<span class="dv">1</span>,<span class="dv">2</span>)
+<span class="dv">2</span>
+
+ghci<span class="fu">&gt;</span> [(<span class="dv">1</span>,<span class="dv">2</span>), (<span class="dv">1</span>,<span class="ch">&#39;a&#39;</span>)] <span class="fu">--&gt;</span> エラー
+ghci<span class="fu">&gt;</span> [(<span class="dv">1</span>,<span class="dv">2</span>), (<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>)] <span class="fu">--&gt;</span> エラー</code></pre>
+</article>
+<article><h3>zip</h3>
+<ul><li>リストとリストから組のリストを作ります</li>
+</ul>
+<pre><code class="sourceCode haskell">ghci<span class="fu">&gt;</span> <span class="fu">zip</span> [<span class="dv">1</span><span class="fu">..</span>] [<span class="st">&quot;apple&quot;</span>, <span class="st">&quot;orange&quot;</span>, <span class="st">&quot;tomato&quot;</span>, <span class="st">&quot;milk&quot;</span>]
+[(<span class="dv">1</span>,<span class="st">&quot;apple&quot;</span>),(<span class="dv">2</span>,<span class="st">&quot;orange&quot;</span>),(<span class="dv">3</span>,<span class="st">&quot;tomato&quot;</span>),(<span class="dv">4</span>,<span class="st">&quot;milk&quot;</span>)]</code></pre>
+<p>今月の日と曜日の対応</p>
+<pre><code class="sourceCode haskell">ghci<span class="fu">&gt;</span> (<span class="fu">!!</span><span class="dv">27</span>) <span class="fu">$</span> <span class="fu">zip</span> [<span class="dv">1</span><span class="fu">..</span>] (<span class="fu">cycle</span> [<span class="st">&quot;Wed&quot;</span>,<span class="st">&quot;Thu&quot;</span>,<span class="st">&quot;Fri&quot;</span>,<span class="st">&quot;Sat&quot;</span>,<span class="st">&quot;Sun&quot;</span>,<span class="st">&quot;Mon&quot;</span>,<span class="st">&quot;Tue&quot;</span>])
+(<span class="dv">28</span>,<span class="st">&quot;Tue&quot;</span>)</code></pre>
+<p>今日は火曜日ですね</p>
+</article>
+<article><h3>タプルとリスト内包表記</h3>
+<ul><li>タプルとリスト内包表記で直角三角形を探しましょう<ul><li>3辺の長さはすべて整数</li>
+<li>各辺の長さは10以下</li>
+<li>周囲の長さは24に等しい</li>
+</ul>
+</li>
+</ul>
+<p>直角三角形の辺をタプルで表す</p>
+<pre><code class="sourceCode haskell">ghci<span class="fu">&gt;</span> [ (a,b,c) <span class="fu">|</span> c<span class="ot">&lt;-</span>[<span class="dv">1</span><span class="fu">..</span><span class="dv">10</span>], a<span class="ot">&lt;-</span>[<span class="dv">1</span><span class="fu">..</span><span class="dv">10</span>], b<span class="ot">&lt;-</span>[<span class="dv">1</span><span class="fu">..</span><span class="dv">10</span>], a<span class="fu">+</span>b<span class="fu">+</span>c<span class="fu">==</span><span class="dv">24</span> ]
+[(<span class="dv">10</span>,<span class="dv">10</span>,<span class="dv">4</span>),(<span class="dv">9</span>,<span class="dv">10</span>,<span class="dv">5</span>),(<span class="dv">10</span>,<span class="dv">9</span>,<span class="dv">5</span>),(<span class="dv">8</span>,<span class="dv">10</span>,<span class="dv">6</span>),(<span class="dv">9</span>,<span class="dv">9</span>,<span class="dv">6</span>),(<span class="dv">10</span>,<span class="dv">8</span>,<span class="dv">6</span>),(<span class="dv">7</span>,<span class="dv">10</span>,<span class="dv">7</span>),(<span class="dv">8</span>,<span class="dv">9</span>,<span class="dv">7</span>),(<span class="dv">9</span>,<span class="dv">8</span>,<span class="dv">7</span>),(<span class="dv">10</span>,<span class="dv">7</span>,<span class="dv">7</span>),(<span class="dv">6</span>,<span class="dv">10</span>,<span class="dv">8</span>),(<span class="dv">7</span>,<span class="dv">9</span>,<span class="dv">8</span>),(<span class="dv">8</span>,<span class="dv">8</span>,<span class="dv">8</span>),(<span class="dv">9</span>,<span class="dv">7</span>,<span class="dv">8</span>),(<span class="dv">10</span>,<span class="dv">6</span>,<span class="dv">8</span>),(<span class="dv">5</span>,<span class="dv">10</span>,<span class="dv">9</span>),(<span class="dv">6</span>,<span class="dv">9</span>,<span class="dv">9</span>),(<span class="dv">7</span>,<span class="dv">8</span>,<span class="dv">9</span>),(<span class="dv">8</span>,<span class="dv">7</span>,<span class="dv">9</span>),(<span class="dv">9</span>,<span class="dv">6</span>,<span class="dv">9</span>),(<span class="dv">10</span>,<span class="dv">5</span>,<span class="dv">9</span>),(<span class="dv">4</span>,<span class="dv">10</span>,<span class="dv">10</span>),(<span class="dv">5</span>,<span class="dv">9</span>,<span class="dv">10</span>),(<span class="dv">6</span>,<span class="dv">8</span>,<span class="dv">10</span>),(<span class="dv">7</span>,<span class="dv">7</span>,<span class="dv">10</span>),(<span class="dv">8</span>,<span class="dv">6</span>,<span class="dv">10</span>),(<span class="dv">9</span>,<span class="dv">5</span>,<span class="dv">10</span>),(<span class="dv">10</span>,<span class="dv">4</span>,<span class="dv">10</span>)]</code></pre>
+<p>ピタゴラスの定理を追加</p>
+<pre><code class="sourceCode haskell">ghci<span class="fu">&gt;</span> [ (a,b,c) <span class="fu">|</span> c<span class="ot">&lt;-</span>[<span class="dv">1</span><span class="fu">..</span><span class="dv">10</span>], a<span class="ot">&lt;-</span>[<span class="dv">1</span><span class="fu">..</span>c], b<span class="ot">&lt;-</span>[<span class="dv">1</span><span class="fu">..</span>a], 
+        a<span class="fu">+</span>b<span class="fu">+</span>c<span class="fu">==</span><span class="dv">24</span>, a<span class="fu">^</span><span class="dv">2</span><span class="fu">+</span>b<span class="fu">^</span><span class="dv">2</span><span class="fu">==</span>c<span class="fu">^</span><span class="dv">2</span> ]
+[(<span class="dv">8</span>,<span class="dv">6</span>,<span class="dv">10</span>)]</code></pre>
+</article>
+<article><h2>型と型クラス</h2>
+</article>
+<article><h3>型システム</h3>
+<ul><li>強力な型システム<ul><li>強い(strongly)</li>
+<li>静的(statically)</li>
+<li>型付け(typed)</li>
+</ul>
+</li>
+<li>型推論</li>
+<li>型クラス</li>
+<li>型シノニム</li>
+<li>型シグネチャ</li>
+<li><code>newtype</code>
+</li>
+<li><code>GADTs</code>
+</li>
+<li>etc.</li>
+</ul>
+</article>
+<article><h3>明示的な型宣言</h3>
+<ul><li>これまで型をわざわざ書いてきませんでした<ul><li>型推論のおかげ</li>
+</ul>
+</li>
+<li><p>明示的に書くこともできます</p>
+</li>
+<li><p>Haskellでは，型名はすべて大文字で始まります</p>
+</li>
+</ul>
+<pre><code class="sourceCode haskell"><span class="ot">removeNonUpper ::</span> [<span class="dt">Char</span>] <span class="ot">-&gt;</span> [<span class="dt">Char</span>]
+removeNonUpper st <span class="fu">=</span> [ c <span class="fu">|</span> c<span class="ot">&lt;-</span>st, c <span class="ot">`elem`</span> [<span class="ch">&#39;A&#39;</span><span class="fu">..</span><span class="ch">&#39;Z&#39;</span>] ]
+
+<span class="ot">addThree ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span>
+addThree x y z <span class="fu">=</span> x <span class="fu">+</span> y <span class="fu">+</span> z</code></pre>
+</article>
+<article><h3>いくつかの標準の型</h3>
+<dl><dd><code>Int</code>
+</dd>
+<p>整数です．32ビットとか64ビットの上限があります</p>
+<dd><code>Integer</code>
+</dd>
+<p>上限のない整数です</p>
+<dd><code>Double</code>
+</dd>
+<p>浮動小数点数です．<code>Float</code>
+より速いという噂もあります</p>
+<dd><code>Bool</code>
+</dd>
+<p>真理値です．<code>True</code>
+と<code>False</code>
+の2つの値があります</p>
+<dd><code>Char</code>
+</dd>
+<p>Unicode文字です．シングルクオートでくくって表します</p>
+</dl>
+</article>
+<article><h3>続・いくつかの標準の型</h3>
+<dl><dd><code>String</code>
+</dd>
+<p>実態は<code>[Char]</code>
+の別名です</p>
+<dd><code>リスト</code>
+</dd>
+<p>型ですが，その定義は要素の型によって決まります</p>
+<dd><code>タプル</code>
+</dd>
+<p>定義は要素の数とそれぞれの型によって決まります</p>
+</dl>
+</article>
+<article><h3>型変数</h3>
+<ul><li><code>head</code>
+関数はリストの先頭を取る関数です</li>
+<li>型に関係なく動作するはずです</li>
+</ul>
+<pre><code class="sourceCode haskell">ghci<span class="fu">&gt;</span> <span class="fu">:</span>t <span class="fu">head</span>
+<span class="fu">head</span><span class="ot"> ::</span> [a] <span class="ot">-&gt;</span> a</code></pre>
+<ul><li><code>a</code>
+は小文字なので型名ではありません</li>
+<li>これは<span class="green">型変数</span>といい，どんな型も取りうることを意味します</li>
+<li>型変数を用いた関数を<span class="green">多相的</span>といったりします</li>
+</ul>
+</article>
+<article><h2>練習問題</h2>
+</article>
+<article><h3>練習問題</h3>
+<ol><li>リスト内包表記を使って，向こう100年のうるう年を列挙しなさい． うるう年の条件は以下とする<ul><li>年が4で割り切れ，かつ100で割り切れない</li>
+<li>もしくは400で割り切れる</li>
+</ul>
+</li>
+<li>リストのリストが与えられたとき，各サブリストに長さを付加する関数を作りなさい</li>
+</ol>
+<pre><code class="sourceCode haskell">ghci<span class="fu">&gt;</span> withLength [<span class="st">&quot;Toyohashi&quot;</span>, <span class="st">&quot;University&quot;</span>, <span class="st">&quot;of&quot;</span>, <span class="st">&quot;Technology&quot;</span>]
+[(<span class="st">&quot;Toyohashi&quot;</span>,<span class="dv">9</span>),(<span class="st">&quot;University&quot;</span>,<span class="dv">10</span>),(<span class="st">&quot;of&quot;</span>,<span class="dv">2</span>),(<span class="st">&quot;Technology&quot;</span>,<span class="dv">10</span>)]</code></pre>
+</article>
+</section>
+</body>
+</html>
