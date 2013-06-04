@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html><head><title>関数型勉強会 第3回 解答</title>
+<meta charset="utf-8">
+<script src="http://html5slides.googlecode.com/svn/trunk/slides.js"></script>
+<style></style>
+<style>table.sourceCode,tr.sourceCode,td.lineNumbers,td.sourceCode,table.sourceCode pre{margin:0;padding:0;border:0;vertical-align:baseline;border:none}td.lineNumbers{border-right:1px solid #AAAAAA;text-align:right;color:#AAAAAA;padding-right:5px;padding-left:5px}td.sourceCode{padding-left:5px}code.sourceCode span.kw{color:#007020;font-weight:bold}code.sourceCode span.dt{color:#902000}code.sourceCode span.dv{color:#40a070}code.sourceCode span.bn{color:#40a070}code.sourceCode span.fl{color:#40a070}code.sourceCode span.ch{color:#4070a0}code.sourceCode span.st{color:#4070a0}code.sourceCode span.co{color:#60a0b0;font-style:italic}code.sourceCode span.ot{color:#007020}code.sourceCode span.al{color:red;font-weight:bold}code.sourceCode span.fu{color:#06287e}code.sourceCode span.er{color:red;font-weight:bold}</style>
+</head>
+<body style="display: none"><section class="slides layout-regular "><article><h1>関数型勉強会 第3回 解答</h1>
+<p>Kazuyoshi Osanai</p>
+<p>May 28, 2013</p>
+</article>
+<article><h3>解答</h3>
+<pre><code class="sourceCode haskell"><span class="ot">uru ::</span> [<span class="dt">Int</span>]
+uru <span class="fu">=</span> [ y <span class="fu">|</span> y<span class="ot">&lt;-</span>[<span class="dv">2013</span><span class="fu">..</span><span class="dv">2113</span>], y<span class="ot">`mod`</span><span class="dv">4</span><span class="fu">==</span><span class="dv">0</span> <span class="fu">&amp;&amp;</span> y<span class="ot">`mod`</span><span class="dv">100</span><span class="fu">/=</span><span class="dv">0</span> <span class="fu">||</span> y<span class="ot">`mod`</span><span class="dv">400</span><span class="fu">==</span><span class="dv">0</span> ]
+
+<span class="ot">withLength ::</span> [[a]] <span class="ot">-&gt;</span> [([a],<span class="dt">Int</span>)]
+withLength xs <span class="fu">=</span> [ (x, <span class="fu">length</span> x) <span class="fu">|</span> x<span class="ot">&lt;-</span>xs ]
+<span class="co">-- withLength xs = if null xs </span>
+<span class="co">--                   then [] </span>
+<span class="co">--                   else (head xs, length (head xs)) : withLength (tail xs)</span></code></pre>
+</article>
+</section>
+</body>
+</html>
