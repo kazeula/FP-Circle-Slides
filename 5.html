@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html><head><title>関数型勉強会 第5回</title>
+<meta charset="utf-8">
+<script src="http://html5slides.googlecode.com/svn/trunk/slides.js"></script>
+<style></style>
+<style>table.sourceCode,tr.sourceCode,td.lineNumbers,td.sourceCode,table.sourceCode pre{margin:0;padding:0;border:0;vertical-align:baseline;border:none}td.lineNumbers{border-right:1px solid #AAAAAA;text-align:right;color:#AAAAAA;padding-right:5px;padding-left:5px}td.sourceCode{padding-left:5px}code.sourceCode span.kw{color:#007020;font-weight:bold}code.sourceCode span.dt{color:#902000}code.sourceCode span.dv{color:#40a070}code.sourceCode span.bn{color:#40a070}code.sourceCode span.fl{color:#40a070}code.sourceCode span.ch{color:#4070a0}code.sourceCode span.st{color:#4070a0}code.sourceCode span.co{color:#60a0b0;font-style:italic}code.sourceCode span.ot{color:#007020}code.sourceCode span.al{color:red;font-weight:bold}code.sourceCode span.fu{color:#06287e}code.sourceCode span.er{color:red;font-weight:bold}</style>
+</head>
+<body style="display: none"><section class="slides layout-regular "><article><h1>関数型勉強会 第5回</h1>
+<p>Kazuyoshi Osanai</p>
+<p>Jun 11, 2013</p>
+</article>
+<article><h3>今回の範囲</h3>
+<ul><li>前回の練習問題の解答</li>
+<li>4章のスライド</li>
+<li>4章と5章に関する練習問題</li>
+</ul>
+</article>
+<article><h2>練習問題の解答</h2>
+</article>
+<article><h3>練習問題1-1</h3>
+<ul><li>1-1. 数値のリストの先頭3つの値を足した値を返す関数<code>addHeadThree</code>
+を実装せよ．エラーとかは考えなくてよい．(パターンマッチ)</li>
+</ul>
+<p>リストに対するパターンマッチの問題</p>
+<pre><code class="sourceCode haskell"><span class="ot">addHeadThree ::</span> (<span class="kw">Num</span> a) <span class="ot">=&gt;</span> [a] <span class="ot">-&gt;</span> a
+addHeadThree (x<span class="fu">:</span>y<span class="fu">:</span>z<span class="fu">:</span>_) <span class="fu">=</span> x <span class="fu">+</span> y <span class="fu">+</span> z</code></pre>
+</article>
+<article><h3>練習問題1-2</h3>
+<ul><li>1-2. <code>Show</code>
+型クラスのインスタンスのリストを受け取り，すべての要素を文字列にして連結した1つの文字列を返す関数<code>listToString</code>
+を実装せよ．(パターンマッチ)</li>
+</ul>
+<p><code>Show</code>
+型クラスのインスタンスには<code>show</code>
+関数が使える</p>
+<pre><code class="sourceCode haskell"><span class="ot">listToString ::</span> (<span class="kw">Show</span> a) <span class="ot">=&gt;</span> [a] <span class="ot">-&gt;</span> <span class="dt">String</span>
+listToString [] <span class="fu">=</span> []
+listToString (x<span class="fu">:</span>xs) <span class="fu">=</span> (<span class="fu">show</span> x) <span class="fu">++</span> listToString xs</code></pre>
+</article>
+<article><h3>練習問題1-3</h3>
+<ul><li>1-3. 比較値とリストを受け取り，リストから比較値と等しい要素がいくつあるかカウントする関数<code>countThat</code>
+を実装せよ．(パターンマッチ，ガード)</li>
+</ul>
+<p>ガードを使って条件分岐を書く</p>
+<pre><code class="sourceCode haskell"><span class="ot">countThat ::</span> (<span class="kw">Eq</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> [a] <span class="ot">-&gt;</span> <span class="dt">Int</span>
+countThat _ [] <span class="fu">=</span> <span class="dv">0</span>
+countThat x (y<span class="fu">:</span>ys) <span class="fu">|</span> x <span class="fu">==</span> y <span class="fu">=</span> <span class="dv">1</span> <span class="fu">+</span> countThat x ys
+                   <span class="fu">|</span> <span class="fu">otherwise</span> <span class="fu">=</span> countThat x ys</code></pre>
+</article>
+<article><h3>練習問題2-1</h3>
+<ul><li>2-1. 2つの2次元ベクトルを受け取り，それらの和を返す関数<code>addV2</code>
+を実装せよ．(パターンマッチ)</li>
+</ul>
+<p>タプルに対するパターンマッチ</p>
+<pre><code class="sourceCode haskell"><span class="ot">addV2 ::</span> (<span class="dt">Double</span>,<span class="dt">Double</span>) <span class="ot">-&gt;</span> (<span class="dt">Double</span>,<span class="dt">Double</span>) <span class="ot">-&gt;</span> (<span class="dt">Double</span>,<span class="dt">Double</span>)
+addV2 (x1,x2) (y1,y2) <span class="fu">=</span> (x1<span class="fu">+</span>y1,x2<span class="fu">+</span>y2)</code></pre>
+</article>
+<article><h3>練習問題2-2</h3>
+<ul><li>2-2. ラジアン角度と2次元ベクトルを受け取り，ベクトルをラジアン角度で回転させた値を返す関数<code>rotateV2</code>
+を実装せよ．(パターンマッチ，<code>where</code>
+)</li>
+</ul>
+<p><code>where</code>
+を使うと関数定義内で複数回使う式をまとめられる． <code>sin, cos</code>
+は<code>Double</code>
+の親クラス<code>Floating</code>
+で定義されている．</p>
+<pre><code class="sourceCode haskell"><span class="ot">rotateV2 ::</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> (<span class="dt">Double</span>,<span class="dt">Double</span>) <span class="ot">-&gt;</span> (<span class="dt">Double</span>,<span class="dt">Double</span>)
+rotateV2 theta (x,y) <span class="fu">=</span> (x<span class="fu">*</span>c <span class="fu">-</span> y<span class="fu">*</span>s, x<span class="fu">*</span>s <span class="fu">+</span> y<span class="fu">*</span>c)
+    <span class="kw">where</span>
+        c <span class="fu">=</span> <span class="fu">cos</span> theta
+        s <span class="fu">=</span> <span class="fu">sin</span> theta</code></pre>
+</article>
+<article><h3>練習問題2-3</h3>
+<ul><li>2-3. 2次元座標値を受け取り，それが第何象限にあるか返す関数<code>quadrant</code>
+を実装せよ．(パターンマッチ，ガード)</li>
+</ul>
+<p>タプルをパターンマッチで分解してガードの条件分岐にかける</p>
+<pre><code class="sourceCode haskell"><span class="ot">quadrant ::</span> (<span class="dt">Double</span>,<span class="dt">Double</span>) <span class="ot">-&gt;</span> <span class="dt">Int</span>
+quadrant (x,y) <span class="fu">|</span> (x<span class="fu">&gt;=</span><span class="dv">0</span>) <span class="fu">&amp;&amp;</span> (y<span class="fu">&gt;=</span><span class="dv">0</span>) <span class="fu">=</span> <span class="dv">1</span>
+               <span class="fu">|</span> (x<span class="fu">&lt;=</span><span class="dv">0</span>) <span class="fu">&amp;&amp;</span> (y<span class="fu">&gt;=</span><span class="dv">0</span>) <span class="fu">=</span> <span class="dv">2</span>
+               <span class="fu">|</span> (x<span class="fu">&lt;=</span><span class="dv">0</span>) <span class="fu">&amp;&amp;</span> (y<span class="fu">&lt;=</span><span class="dv">0</span>) <span class="fu">=</span> <span class="dv">3</span>
+               <span class="fu">|</span> (x<span class="fu">&gt;=</span><span class="dv">0</span>) <span class="fu">&amp;&amp;</span> (y<span class="fu">&lt;=</span><span class="dv">0</span>) <span class="fu">=</span> <span class="dv">4</span></code></pre>
+</article>
+<article><h3>練習問題3-1</h3>
+<ul><li><p>3-1. 2つの値を受け取り，比較の結果によって次の値を返す関数<code>describeComparison</code>
+を実装せよ．(<code>where</code>
+, <code>case</code>
+)</p>
+<ul><li>等しい: [Aの値] equal to [Bの値].</li>
+<li>1つ目の値が小さい: [Aの値] is smaller than [Bの値].</li>
+<li>1つ目の値が大きい: [Aの値] is larger than [Bの値].</li>
+</ul>
+</li>
+</ul>
+<p>比較関係の型クラスには<code>Eq, Ord</code>
+がある． <code>Ord</code>
+の関数<code>compare</code>
+を使えば「大きい」「等しい」「小さい」の場合分けができる． <code>&lt;</code>
+演算子を使ってもよい．</p>
+<pre><code class="sourceCode haskell"><span class="ot">describeComparison ::</span> (<span class="kw">Ord</span> a, <span class="kw">Show</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">String</span>
+describeComparison x y <span class="fu">=</span> <span class="fu">show</span> x <span class="fu">++</span> <span class="st">&quot; &quot;</span> <span class="fu">++</span> comp <span class="fu">++</span> <span class="st">&quot; &quot;</span> <span class="fu">++</span> <span class="fu">show</span> y <span class="fu">++</span> <span class="st">&quot;.&quot;</span>
+    <span class="kw">where</span> comp <span class="fu">=</span> <span class="kw">case</span> <span class="fu">compare</span> x y <span class="kw">of</span>
+                  <span class="kw">EQ</span> <span class="ot">-&gt;</span> <span class="st">&quot;equal to&quot;</span>
+                  <span class="kw">LT</span> <span class="ot">-&gt;</span> <span class="st">&quot;is smaller than&quot;</span>
+                  <span class="kw">GT</span> <span class="ot">-&gt;</span> <span class="st">&quot;is larger than&quot;</span></code></pre>
+</article>
+<article><h2>再帰の考え方</h2>
+</article>
+<article><h3>基底部</h3>
+<ul><li>再帰を考えるときは，これ以上分解できない<span class="green">基底部</span>をまず考える<ul><li>フィボナッチ数列の基底部: F(0)=0, F(1)=1</li>
+</ul>
+</li>
+<li>基底部ができたら，それ以外の部分<ul><li>フィボナッチ数列: F(n)=F(n-1)+F(n-2)</li>
+<li>最終的に基底部だけで表せたらOK: F(3) = F(2)+F(1) = F(1)+F(0)+F(1)</li>
+</ul>
+</li>
+<li>Haskellでは「どうやるか」ではなく「何であるか」を宣言する</li>
+</ul>
+</article>
+<article><h3>基底部の練習: <code>maximum</code>
+</h3>
+<ul><li><p>リストから最大の要素をとる<code>maximum</code>
+関数を考える</p>
+</li>
+<li><p>基底部は?</p>
+</li>
+</ul>
+</article>
+<article><h3>基底部の練習: <code>maximum</code>
+</h3>
+<ul><li>基底部は，<ul><li>要素が0のとき</li>
+<li>要素が1のとき</li>
+</ul>
+</li>
+<li><code>max</code>
+は2引数をとり大きい方を返す関数である</li>
+</ul>
+<pre><code class="sourceCode haskell"><span class="ot">maximum&#39; ::</span> (<span class="kw">Ord</span> a) <span class="ot">=&gt;</span> [a] <span class="ot">-&gt;</span> a
+maximum&#39; [] <span class="fu">=</span> <span class="fu">error</span> <span class="st">&quot;try to get maximum of empty list&quot;</span>
+maximum&#39; [x] <span class="fu">=</span> x
+maximum&#39; (x<span class="fu">:</span>xs) <span class="fu">=</span> <span class="fu">max</span> x (mamimum&#39; xs)</code></pre>
+<!-- ' -->
+</article>
+<article><h3>クイックソートは何をやっているのか?</h3>
+<ul><li>最初に見せたクイックソートのコード</li>
+</ul>
+<pre><code class="sourceCode haskell"><span class="ot">quicksort ::</span> <span class="kw">Ord</span> a <span class="ot">=&gt;</span> [a] <span class="ot">-&gt;</span> [a]
+quicksort [] <span class="fu">=</span> []
+quicksort (x<span class="fu">:</span>xs) <span class="fu">=</span> smaller <span class="fu">++</span> [x] <span class="fu">++</span> greater
+  <span class="kw">where</span> smaller <span class="fu">=</span> quicksort [y <span class="fu">|</span> y<span class="ot">&lt;-</span>xs, y<span class="fu">&lt;=</span>x]
+        greater <span class="fu">=</span> quicksort [y <span class="fu">|</span> y<span class="ot">&lt;-</span>xs, y<span class="fu">&gt;</span>x]</code></pre>
+</article>
+<article><h3>クイックソートは何をやっているのか?</h3>
+<ul><li>基底部: &quot;空リスト<code>[]</code>
+はソートしても空リスト<code>[]</code>
+&quot;</li>
+<li>再帰部:<ul><li>リストの先頭要素<code>x</code>
+ピボットに，</li>
+<li><code>x</code>
+の前に<code>x</code>
+より小さいもののソート列，</li>
+<li><code>x</code>
+の後に<code>x</code>
+より大きいもののソート列を連結する</li>
+<li><code>x</code>
+より小さい/大きいものはリスト内包表記で取得し，再帰にかけてソート</li>
+</ul>
+</li>
+</ul>
+<pre><code class="sourceCode haskell"><span class="ot">quicksort ::</span> <span class="kw">Ord</span> a <span class="ot">=&gt;</span> [a] <span class="ot">-&gt;</span> [a]
+quicksort [] <span class="fu">=</span> []
+quicksort (x<span class="fu">:</span>xs) <span class="fu">=</span> smaller <span class="fu">++</span> [x] <span class="fu">++</span> greater
+  <span class="kw">where</span> smaller <span class="fu">=</span> quicksort [y <span class="fu">|</span> y<span class="ot">&lt;-</span>xs, y<span class="fu">&lt;=</span>x]
+        greater <span class="fu">=</span> quicksort [y <span class="fu">|</span> y<span class="ot">&lt;-</span>xs, y<span class="fu">&gt;</span>x]</code></pre>
+</article>
+<article><h3>クイックソートの疑問</h3>
+<ul><li><p>基底部これだけ?</p>
+</li>
+<li><p>これも基底部なんじゃね?</p>
+</li>
+</ul>
+<pre><code class="sourceCode haskell">quicksort [] <span class="fu">=</span> []
+quicksort [x] <span class="fu">=</span> [x]
+quicksort (x<span class="fu">:</span>y<span class="fu">:</span>[]) <span class="fu">|</span> x <span class="fu">&gt;</span> y <span class="fu">=</span> [y,x]
+                   <span class="fu">|</span> <span class="fu">otherwise</span> <span class="fu">=</span> [x,y]</code></pre>
+</article>
+<article><h3>クイックソートの疑問</h3>
+<ul><li><p>再帰部を書くと，基底部は空リストだけで十分だとわかる</p>
+</li>
+<li><p>迷ったときはとりあえず基底部をできるだけ書いて，後からいらないものを消す方針でよい</p>
+</li>
+</ul>
+</article>
+<article><h3>再帰が分からない人は...</h3>
+<ul><li>山本和彦さんの「再帰ドリル」がおすすめ<ul><li>再帰ドリル: https://github.com/kazu-yamamoto/recursion-drill</li>
+<li>Emacsのメーラー<code>Mew</code>
+の作者</li>
+<li>Haskell製Webサーバ<code>Mighttpd2</code>
+の作者</li>
+</ul>
+</li>
+</ul>
+</article>
+<article><h2>練習問題</h2>
+</article>
+<article><h3>今回の練習問題</h3>
+<ul><li><p><code>foldl</code>
+や<code>foldr</code>
+を使って，できるだけ明示的な再帰を書かずにやってみよう</p>
+</li>
+<li><p>リスト内包表記を使わずに，<code>map</code>
+や<code>filter</code>
+で書いてみよう</p>
+</li>
+<li><code>$</code>
+や<code>.</code>
+や<code>flip</code>
+やラムダ式を使って，できるだけポイントフリースタイルで書いてみよう<ul><li>ポイントフリースタイル: できるだけ変数を使わずに関数の連結でなんとかするスタイル</li>
+</ul>
+</li>
+</ul>
+</article>
+<article><h3>練習問題1</h3>
+<p>以下の関数を実装しなさい</p>
+<ul><li>1-1. リストの最小の要素を返す<code>minimum</code>
+</li>
+<li>1-2. リストを反転する<code>reverse</code>
+</li>
+<li>1.3. リストからn個の要素を取る<code>take</code>
+</li>
+</ul>
+<pre><code class="sourceCode haskell"><span class="ot">minimum&#39; ::</span> (<span class="kw">Ord</span> a) <span class="ot">=&gt;</span> [a] <span class="ot">-&gt;</span> a
+<span class="ot">reverse&#39; ::</span> [a] <span class="ot">-&gt;</span> [a]
+<span class="ot">take&#39; ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> [a] <span class="ot">-&gt;</span> [a]</code></pre>
+<!-- ' -->
+</article>
+<article><h3>練習問題2</h3>
+<p>以下の関数を実装しなさい</p>
+<ul><li>2-1. <code>Int</code>
+のリストを受け取り，奇数かつ10以下の要素のみを抜き出して，すべての要素を2倍する関数</li>
+<li>2-2. <code>Int</code>
+の値<code>n</code>
+を受け取り，2以上16以下の偶数からなるリストのそれぞれの要素で<code>n</code>
+を割った値のリストを返す関数(余り切り捨て)</li>
+</ul>
+<pre><code class="sourceCode haskell"><span class="ot">smallOddTwice ::</span> [<span class="dt">Int</span>] <span class="ot">-&gt;</span> [<span class="dt">Int</span>]
+<span class="ot">divByEvens ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> [<span class="dt">Int</span>]</code></pre>
+</article>
+<article><h3>練習問題3</h3>
+<p>以下の関数を実装しなさい</p>
+<ul><li>3-1. リストの最初の要素を初期値とする<code>foldr</code>
+，<code>foldr1</code>
+</li>
+<li>3-2. <code>foldl</code>
+を<code>foldr</code>
+で実装しなさい</li>
+</ul>
+<pre><code class="sourceCode haskell"><span class="fu">foldr1</span><span class="ot"> ::</span> (a <span class="ot">-&gt;</span> b <span class="fu">&gt;</span> b) <span class="ot">-&gt;</span> [b] <span class="ot">-&gt;</span> a
+<span class="ot">foldl&#39; ::</span> (a <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> a) <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> [b] <span class="ot">-&gt;</span> a</code></pre>
+</article>
+</section>
+</body>
+</html>
