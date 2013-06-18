@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html><head><title>関数型勉強会 第6回</title>
+<meta charset="utf-8">
+<script src="http://html5slides.googlecode.com/svn/trunk/slides.js"></script>
+<style></style>
+<style>table.sourceCode,tr.sourceCode,td.lineNumbers,td.sourceCode,table.sourceCode pre{margin:0;padding:0;border:0;vertical-align:baseline;border:none}td.lineNumbers{border-right:1px solid #AAAAAA;text-align:right;color:#AAAAAA;padding-right:5px;padding-left:5px}td.sourceCode{padding-left:5px}code.sourceCode span.kw{color:#007020;font-weight:bold}code.sourceCode span.dt{color:#902000}code.sourceCode span.dv{color:#40a070}code.sourceCode span.bn{color:#40a070}code.sourceCode span.fl{color:#40a070}code.sourceCode span.ch{color:#4070a0}code.sourceCode span.st{color:#4070a0}code.sourceCode span.co{color:#60a0b0;font-style:italic}code.sourceCode span.ot{color:#007020}code.sourceCode span.al{color:red;font-weight:bold}code.sourceCode span.fu{color:#06287e}code.sourceCode span.er{color:red;font-weight:bold}</style>
+</head>
+<body style="display: none"><section class="slides layout-regular "><article><h1>関数型勉強会 第6回</h1>
+<p>Kazuyoshi Osanai</p>
+<p>Jun 18, 2013</p>
+</article>
+<article><h3>今回の範囲</h3>
+<ul><li>前回の練習問題の解答</li>
+<li>6章のスライド</li>
+<li>6章に関する練習問題</li>
+</ul>
+</article>
+<article><h2>練習問題の解答</h2>
+</article>
+<article><h3>1-1. リストの最小の要素を返す<code>minimum</code>
+</h3>
+<pre><code class="sourceCode haskell"><span class="ot">minimum&#39; ::</span> (<span class="kw">Ord</span> a) <span class="ot">=&gt;</span> [a] <span class="ot">-&gt;</span> a
+minimum&#39; [] <span class="fu">=</span> <span class="fu">error</span> <span class="st">&quot;try to get minimum of empty list&quot;</span>
+minimum&#39; (x<span class="fu">:</span>xs) <span class="fu">=</span> <span class="fu">foldl</span> <span class="fu">min</span> x xs</code></pre>
+<!-- ' -->
+</article>
+<article><h3>1-2. リストを反転する<code>reverse</code>
+</h3>
+<pre><code class="sourceCode haskell"><span class="ot">reverse&#39; ::</span> [a] <span class="ot">-&gt;</span> [a]
+reverse&#39; <span class="fu">=</span> <span class="fu">foldr</span> f []
+    <span class="kw">where</span> f x r <span class="fu">=</span> r <span class="fu">++</span> [x]
+
+<span class="ot">reverse&#39;&#39; ::</span> [a] <span class="ot">-&gt;</span> [a]
+reverse&#39;&#39; <span class="fu">=</span> <span class="fu">foldl</span> f []
+    <span class="kw">where</span> f r x <span class="fu">=</span> x <span class="fu">:</span> r
+
+<span class="ot">reverse&#39;&#39;&#39; ::</span> [a] <span class="ot">-&gt;</span> [a]
+reverse&#39;&#39;&#39; <span class="fu">=</span> <span class="fu">foldl</span> (<span class="fu">flip</span> (<span class="fu">:</span>)) []</code></pre>
+</article>
+<article><h3>1.3. リストからn個の要素を取る<code>take</code>
+</h3>
+<pre><code class="sourceCode haskell"><span class="ot">take&#39; ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> [a] <span class="ot">-&gt;</span> [a]
+take&#39; n <span class="fu">=</span> <span class="fu">foldr</span> f [] <span class="fu">.</span> <span class="fu">zip</span> [<span class="dv">0</span><span class="fu">..</span>]
+    <span class="kw">where</span> f (m,x) r <span class="fu">=</span> <span class="kw">if</span> n<span class="fu">&lt;=</span>m <span class="kw">then</span> r <span class="kw">else</span> (x<span class="fu">:</span>r)</code></pre>
+</article>
+<article><h3>2-1. <code>Int</code>
+のリストを受け取り，奇数かつ10以下の要素のみを抜き出して，すべての要素を2倍する関数</h3>
+<pre><code class="sourceCode haskell"><span class="ot">smallOddTwice ::</span> [<span class="dt">Int</span>] <span class="ot">-&gt;</span> [<span class="dt">Int</span>]
+smallOddTwice <span class="fu">=</span> <span class="fu">map</span> (<span class="dv">2</span><span class="fu">*</span>) <span class="fu">.</span> <span class="fu">filter</span> (<span class="fu">&lt;</span><span class="dv">10</span>) <span class="fu">.</span> <span class="fu">filter</span> <span class="fu">odd</span></code></pre>
+</article>
+<article><h3>2-2. <code>Int</code>
+の値<code>n</code>
+を受け取り，2以上16以下の偶数からなるリストのそれぞれの要素で<code>n</code>
+を割った値のリストを返す関数(余り切り捨て)</h3>
+<pre><code class="sourceCode haskell"><span class="ot">divByEvens ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> [<span class="dt">Int</span>]
+divByEvens <span class="fu">=</span> <span class="fu">flip</span> <span class="fu">map</span> evens <span class="fu">.</span> <span class="fu">div</span>
+    <span class="kw">where</span> evens <span class="fu">=</span> <span class="fu">filter</span> <span class="fu">even</span> [<span class="dv">2</span><span class="fu">..</span><span class="dv">16</span>]
+
+<span class="ot">divByEvens&#39; ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> [<span class="dt">Int</span>]
+divByEvens&#39; <span class="fu">=</span> <span class="fu">zipWith</span> (<span class="fu">flip</span> <span class="fu">div</span>) evens <span class="fu">.</span> <span class="fu">repeat</span>
+    <span class="kw">where</span> evens <span class="fu">=</span> <span class="fu">filter</span> <span class="fu">even</span> [<span class="dv">2</span><span class="fu">..</span><span class="dv">16</span>]</code></pre>
+<!-- ' -->
+</article>
+<article><h3>3-1. リストの最初の要素を初期値とする<code>foldr</code>
+，<code>foldr1</code>
+</h3>
+<pre><code class="sourceCode haskell"><span class="ot">foldr1&#39; ::</span> (a <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> a) <span class="ot">-&gt;</span> [a] <span class="ot">-&gt;</span> a
+foldr1&#39; f (x<span class="fu">:</span>xs) <span class="fu">=</span> <span class="fu">foldr</span> f x xs</code></pre>
+<!-- ' -->
+</article>
+<article><h3>3-2. <code>foldl</code>
+を<code>foldr</code>
+で実装しなさい</h3>
+<pre><code class="sourceCode haskell"><span class="ot">foldl&#39; ::</span> (a <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> a) <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> [b] <span class="ot">-&gt;</span> a
+foldl&#39; f z xs <span class="fu">=</span> <span class="fu">foldr</span> step <span class="fu">id</span> xs z
+    <span class="kw">where</span> step x r a <span class="fu">=</span> r (f a x)</code></pre>
+</article>
+<article><h2>モジュール</h2>
+</article>
+<article><h3>モジュール</h3>
+<ul><li><p>Haskellプログラムで名前を見えるようにしたり， 見えないようにしたりするための仕組みです</p>
+</li>
+<li><p>よいモジュール設計は<span class="green">疎結合</span>を実現し， コードの再利用性を高めます</p>
+</li>
+</ul>
+</article>
+<article><h3>GHCiでのインポート</h3>
+<ul><li><p><code>:m</code>
+ のあとに，頭にプラス(+)をつけたモジュール名を書きます</p>
+</li>
+<li><p>モジュールを見えないようにするには同様にマイナス(-)をつけます</p>
+</li>
+</ul>
+<pre><code class="sourceCode haskell">ghci<span class="fu">&gt;</span> <span class="fu">:</span>m <span class="fu">+</span><span class="dt">Data.List</span> <span class="dt">Data.Map</span>
+ghci<span class="fu">&gt;</span> <span class="fu">:</span>m <span class="fu">-</span><span class="dt">Data.List</span></code></pre>
+</article>
+<article><h3>コードでのインポート</h3>
+<ul><li>いろいろな<code>import</code>
+のしかたがある</li>
+</ul>
+<pre><code class="sourceCode haskell"><span class="kw">import</span> <span class="dt">Data.List</span>
+<span class="kw">import</span> <span class="dt">Data.List</span> (<span class="fu">sort</span>)
+<span class="kw">import</span> <span class="dt">Data.List</span> <span class="kw">hiding</span> (nub)
+<span class="kw">import</span> <span class="kw">qualified</span> <span class="dt">Data.List</span>
+<span class="kw">import</span> <span class="kw">qualified</span> <span class="dt">Data.List</span> <span class="kw">as</span> <span class="dt">L</span></code></pre>
+</article>
+<article><h3>標準モジュールいろいろ</h3>
+<ul><li><code>Data.List</code>
+: リスト操作</li>
+<li><code>Data.Map</code>
+: 連想配列っぽい操作(実装は木構造，ハッシュじゃないよ)</li>
+</ul>
+<pre><code class="sourceCode haskell"><span class="kw">import</span> <span class="kw">qualified</span> <span class="dt">Data.List</span> <span class="kw">as</span> <span class="dt">L</span>
+<span class="kw">import</span> <span class="kw">qualified</span> <span class="dt">Data.Map</span> <span class="kw">as</span> <span class="dt">M</span>
+
+helloWords <span class="fu">=</span> L.words <span class="st">&quot;long time no see&quot;</span>
+
+students <span class="fu">=</span> M.fromList [(<span class="dv">103502</span>, <span class="st">&quot;Takahashi&quot;</span>), (<span class="dv">103503</span>，<span class="st">&quot;Ito&quot;</span>)]
+maybe103502 <span class="fu">=</span> M.lookup <span class="dv">103502</span> students</code></pre>
+</article>
+<article><h3>モジュールの作り方</h3>
+<ul><li>省略</li>
+</ul>
+</article>
+<article><h2>練習問題</h2>
+</article>
+<article><h3>練習問題1</h3>
+<ul><li>1-1. 英文文字列を受け取り，大文字の数をカウントする関数を作りなさい</li>
+<li>1-2. <code>Map Int String</code>
+ を受け取り，キーが偶数のエントリーのバリューを先頭3文字以下に切り詰める関数を作りなさい</li>
+<li>1-3. 各セルに整数値が入っている複数行のcsv形式の文字列を <code>[[Int]]</code>
+ に変換する関数を作りなさい</li>
+</ul>
+<pre><code class="sourceCode haskell"><span class="ot">addBreak ::</span> <span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">Int</span>
+<span class="ot">cutoffEven ::</span> <span class="dt">Map</span> <span class="dt">Int</span> <span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">Map</span> <span class="dt">Int</span> <span class="dt">String</span>
+<span class="ot">readCSV ::</span> <span class="dt">String</span> <span class="ot">-&gt;</span> [[<span class="dt">Int</span>]]</code></pre>
+</article>
+</section>
+</body>
+</html>
