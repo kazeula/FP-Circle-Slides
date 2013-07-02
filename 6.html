@@ -101,14 +101,16 @@ ghci<span class="fu">&gt;</span> <span class="fu">:</span>m <span class="fu">-</
 <pre><code class="sourceCode haskell"><span class="kw">import</span> <span class="dt">Data.List</span>
 <span class="kw">import</span> <span class="dt">Data.List</span> (<span class="fu">sort</span>)
 <span class="kw">import</span> <span class="dt">Data.List</span> <span class="kw">hiding</span> (nub)
-<span class="kw">import</span> <span class="kw">qualified</span> <span class="dt">Data.List</span>
-<span class="kw">import</span> <span class="kw">qualified</span> <span class="dt">Data.List</span> <span class="kw">as</span> <span class="dt">L</span></code></pre>
+<span class="kw">import</span> <span class="kw">qualified</span> <span class="dt">Data.List</span> <span class="co">-- 修飾つきインポート(1)</span>
+<span class="kw">import</span> <span class="kw">qualified</span> <span class="dt">Data.List</span> <span class="kw">as</span> <span class="dt">L</span> <span class="co">-- 修飾つきインポート(2)</span></code></pre>
 </article>
 <article><h3>標準モジュールいろいろ</h3>
 <ul><li><code>Data.List</code>
 : リスト操作</li>
 <li><code>Data.Map</code>
 : 連想配列っぽい操作(実装は木構造，ハッシュじゃないよ)</li>
+<li><code>Data.Set</code>
+: 集合の操作</li>
 </ul>
 <pre><code class="sourceCode haskell"><span class="kw">import</span> <span class="kw">qualified</span> <span class="dt">Data.List</span> <span class="kw">as</span> <span class="dt">L</span>
 <span class="kw">import</span> <span class="kw">qualified</span> <span class="dt">Data.Map</span> <span class="kw">as</span> <span class="dt">M</span>
@@ -118,9 +120,39 @@ helloWords <span class="fu">=</span> L.words <span class="st">&quot;long time no
 students <span class="fu">=</span> M.fromList [(<span class="dv">103502</span>, <span class="st">&quot;Takahashi&quot;</span>), (<span class="dv">103503</span>，<span class="st">&quot;Ito&quot;</span>)]
 maybe103502 <span class="fu">=</span> M.lookup <span class="dv">103502</span> students</code></pre>
 </article>
+<article><h3>標準モジュールいろいろ(2)</h3>
+<ul><li><code>Data</code>
+系: データ構造系のモジュール群</li>
+<li><code>Control</code>
+系: モナドとか高度な抽象化関係のモジュール群</li>
+<li><p><code>System</code>
+系: コンソールとかCPUとかOS寄りのモジュール群</p>
+</li>
+<li><p>詳しくはGHC添付のドキュメントか， &quot;Haskell Hierarchical Libraries&quot;で検索</p>
+</li>
+</ul>
+</article>
 <article><h3>モジュールの作り方</h3>
 <ul><li>省略</li>
 </ul>
+</article>
+<article><h3>遅延評価の罠</h3>
+<ul><li>再帰呼び出しによるスタックオーバーフローを起こしやすい</li>
+<li>部分的に正格評価を取り入れることで解決する</li>
+<li>今日は説明しないが (悪名高い)<code>seq</code>
+ とか <code>pseq</code>
+ とか <code>Bang Patterns</code>
+ とかを使う</li>
+<li><code>foldl</code>
+については<code>Data.List</code>
+の<code>foldl&#39;</code>
+が正格版</li>
+</ul>
+<pre><code class="sourceCode haskell">ghci<span class="fu">&gt;</span> <span class="fu">foldl</span> (<span class="fu">+</span>) <span class="dv">0</span> [<span class="dv">1</span><span class="fu">..</span><span class="dv">10000000</span>]
+<span class="co">-- 終わらない計算...</span>
+ghci<span class="fu">&gt;</span> <span class="fu">:</span>m <span class="fu">+</span><span class="dt">Data.List</span>
+ghci<span class="fu">&gt;</span> foldl&#39; (<span class="fu">+</span>) <span class="dv">0</span> [<span class="dv">1</span><span class="fu">..</span><span class="dv">10000000</span>]
+<span class="dv">50000005000000</span></code></pre>
 </article>
 <article><h2>練習問題</h2>
 </article>
