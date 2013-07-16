@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html><head><title>関数型勉強会 第7回</title>
+<meta charset="utf-8">
+<script src="http://html5slides.googlecode.com/svn/trunk/slides.js"></script>
+<style></style>
+<style>table.sourceCode,tr.sourceCode,td.lineNumbers,td.sourceCode,table.sourceCode pre{margin:0;padding:0;border:0;vertical-align:baseline;border:none}td.lineNumbers{border-right:1px solid #AAAAAA;text-align:right;color:#AAAAAA;padding-right:5px;padding-left:5px}td.sourceCode{padding-left:5px}code.sourceCode span.kw{color:#007020;font-weight:bold}code.sourceCode span.dt{color:#902000}code.sourceCode span.dv{color:#40a070}code.sourceCode span.bn{color:#40a070}code.sourceCode span.fl{color:#40a070}code.sourceCode span.ch{color:#4070a0}code.sourceCode span.st{color:#4070a0}code.sourceCode span.co{color:#60a0b0;font-style:italic}code.sourceCode span.ot{color:#007020}code.sourceCode span.al{color:red;font-weight:bold}code.sourceCode span.fu{color:#06287e}code.sourceCode span.er{color:red;font-weight:bold}</style>
+</head>
+<body style="display: none"><section class="slides layout-regular "><article><h1>関数型勉強会 第7回</h1>
+<p>Kazuyoshi Osanai</p>
+<p>Jul 17, 2013</p>
+</article>
+<article><h3>今回の範囲</h3>
+<ul><li>前回の練習問題の解答</li>
+<li>7章前半のスライド</li>
+<li>7章前半に関する練習問題</li>
+</ul>
+</article>
+<article><h2>練習問題の解答</h2>
+</article>
+<article><h3>前回のテーマ</h3>
+<ul><li>Haskellのモジュール機能を知る<ul><li>さまざまな<code>import</code>
+の構文</li>
+</ul>
+</li>
+<li>よく利用される標準モジュールを使えるようになる<ul><li>いくつかのモジュールの概略</li>
+<li>ドキュメントの引き方</li>
+</ul>
+</li>
+<li>モジュールの作り方は省略</li>
+</ul>
+</article>
+<article><h3>1-1. 英文文字列を受け取り，大文字の数をカウントする関数を作りなさい(<code>Data.Char</code>
+)</h3>
+<pre><code class="sourceCode haskell"><span class="kw">import</span> <span class="kw">qualified</span> <span class="dt">Data.Char</span> <span class="kw">as</span> <span class="dt">C</span>
+
+<span class="ot">addBreak ::</span> <span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">Int</span>
+addBreak <span class="fu">=</span> <span class="fu">length</span> <span class="fu">.</span> <span class="fu">filter</span> C.isUpper</code></pre>
+</article>
+<article><h3>1-2. <code>Map Int String</code>
+ を受け取り，キーが偶数のエントリーのバリューを先頭3文字以下に切り詰める関数を作りなさい(<code>Data.Map</code>
+)</h3>
+<pre><code class="sourceCode haskell"><span class="kw">import</span> <span class="kw">qualified</span> <span class="dt">Data.Map</span> <span class="kw">as</span> <span class="dt">M</span>
+
+<span class="ot">cutoffEven ::</span> <span class="dt">M.Map</span> <span class="dt">Int</span> <span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">M.Map</span> <span class="dt">Int</span> <span class="dt">String</span>
+cutoffEven <span class="fu">=</span> M.mapMaybeWithKey f
+    <span class="kw">where</span> 
+        f k v <span class="fu">=</span> <span class="kw">if</span> <span class="fu">even</span> k <span class="kw">then</span> <span class="kw">Just</span> <span class="fu">$</span> <span class="fu">take</span> <span class="dv">3</span> v <span class="kw">else</span> <span class="kw">Just</span> v</code></pre>
+</article>
+<article><h3>1-3. 各セルに整数値が入っている複数行のcsv形式の文字列を<code>[[Int]]</code>
+ に変換する関数を作りなさい(<code>Data.List</code>
+)</h3>
+<ul><li>前回のスライドには<code>Data.Map</code>
+とありましたが，これは<code>Data.List</code>
+のまちがいでした．お詫びして訂正します</li>
+</ul>
+<pre><code class="sourceCode haskell"><span class="kw">import</span> <span class="dt">Data.List</span> (<span class="fu">break</span>)
+
+<span class="ot">split ::</span> (<span class="kw">Eq</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> [a]<span class="ot">-&gt;</span> [[a]]
+split _ [] <span class="fu">=</span> []
+split x ys <span class="fu">=</span> <span class="kw">if</span> <span class="fu">null</span> r <span class="kw">then</span> [l] <span class="kw">else</span> l <span class="fu">:</span> split x (<span class="fu">tail</span> r)
+  <span class="kw">where</span>
+    (l,r) <span class="fu">=</span> <span class="fu">break</span> (<span class="fu">==</span>x) ys
+
+<span class="ot">readCSV ::</span> <span class="dt">String</span> <span class="ot">-&gt;</span> [[<span class="dt">Int</span>]]
+readCSV <span class="fu">=</span> <span class="fu">map</span> (castLine <span class="fu">.</span> split <span class="ch">&#39;,&#39;</span>) <span class="fu">.</span> <span class="fu">lines</span> 
+  <span class="kw">where</span>
+    castLine <span class="fu">=</span> <span class="fu">map</span> <span class="fu">readInt</span>
+    <span class="fu">readInt</span> <span class="fu">=</span><span class="ot"> read ::</span> <span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">Int</span></code></pre>
+</article>
+<article><h2>型や型クラス(前半)</h2>
+</article>
+<article><h3>今回のテーマ</h3>
+<ul><li>基本的な型定義ができるようになる<ul><li>型引数を含まない型</li>
+<li>レコード構文の使い時</li>
+</ul>
+</li>
+<li>型引数を含む型定義を利用できるようになる<ul><li>型引数の使い時</li>
+</ul>
+</li>
+</ul>
+</article>
+<article><h3>データ型の定義</h3>
+<ul><li><code>data</code>
+キーワードを利用する方法</li>
+</ul>
+<pre><code class="sourceCode haskell"><span class="kw">data</span> <span class="dt">Bool</span> <span class="fu">=</span> <span class="kw">False</span> <span class="fu">|</span> <span class="kw">True</span></code></pre>
+<ul><li><code>=</code>
+の直後が<code>値コンストラクタ</code>
+で，<code>|</code>
+は「または」の意味<ul><li>値コンストラクタは<code>True</code>
+と<code>False</code>
+の2つ</li>
+</ul>
+</li>
+<li>「<code>Bool</code>
+は<code>False</code>
+と<code>True</code>
+の値を取り得る」と読める</li>
+</ul>
+</article>
+<article><h3>複数のフィールドを持つ型</h3>
+<pre><code class="sourceCode haskell"><span class="kw">data</span> <span class="dt">Shape</span> <span class="fu">=</span> <span class="dt">Circle</span> <span class="dt">Double</span> <span class="dt">Double</span> <span class="dt">Double</span> <span class="fu">|</span>
+             <span class="dt">Rect</span> <span class="dt">Double</span> <span class="dt">Double</span> <span class="dt">Double</span> <span class="dt">Double</span>
+
+ghci<span class="fu">&gt;</span> <span class="fu">:</span>t <span class="dt">Circle</span>
+<span class="dt">Circle</span><span class="ot"> ::</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Shape</span>
+ghci<span class="fu">&gt;</span> <span class="fu">:</span>t <span class="dt">Circle</span> <span class="fl">1.0</span> <span class="fl">2.0</span> <span class="fl">3.0</span>
+<span class="dt">Shape</span></code></pre>
+<ul><li><code>=</code>
+の直後が<code>値コンストラクタ</code>
+<ul><li>→ 値コンストラクタは<code>Circle</code>
+と<code>Shape</code>
+</li>
+</ul>
+</li>
+<li>オブジェクト指向のコンストラクタと同じように， 型を生成する</li>
+<li>ほかの名前(ここでは<code>Double</code>
+)は<code>フィールド</code>
+</li>
+</ul>
+</article>
+<article><h3>レコード構文</h3>
+<ul><li>フィールドに名前を付けることができる</li>
+<li>フィールドを取り出す関数が生成される</li>
+<li>コンストラクトの方法が変わる</li>
+</ul>
+<pre><code class="sourceCode haskell"><span class="kw">data</span> <span class="dt">Person</span> <span class="fu">=</span> <span class="dt">Person</span> {<span class="ot"> firstName ::</span> <span class="dt">String</span>
+                     ,<span class="ot"> lastName ::</span> <span class="dt">String</span>
+                     ,<span class="ot"> age ::</span> <span class="dt">Int</span> }
+
+ghci<span class="fu">&gt;</span> <span class="fu">:</span>t firstName
+<span class="ot">firstName ::</span> <span class="dt">Person</span> <span class="ot">-&gt;</span> <span class="dt">String</span>
+ghci<span class="fu">&gt;</span> firstName (<span class="dt">Person</span> {firstName<span class="fu">=</span><span class="st">&quot;Alan&quot;</span>, lastName<span class="fu">=</span><span class="st">&quot;Wake&quot;</span>, age<span class="fu">=</span><span class="dv">30</span>})
+<span class="st">&quot;Alan&quot;</span><span class="ot"> ::</span> <span class="dt">String</span></code></pre>
+</article>
+<article><h3>型引数を使った型定義</h3>
+<ul><li>多相的な型を定義するための1つの方法</li>
+<li>関数定義の型変数と同様のイメージ<ul><li><code>a</code>
+は小文字なので明確な型ではない</li>
+</ul>
+</li>
+</ul>
+<pre><code class="sourceCode haskell"><span class="kw">data</span> <span class="dt">Maybe</span> a <span class="fu">=</span> <span class="kw">Nothing</span> <span class="fu">|</span> <span class="kw">Just</span> a
+<span class="kw">data</span> <span class="dt">Vector</span> a <span class="fu">=</span> <span class="dt">Vector</span> a a <span class="co">-- 2次元ベクトル</span></code></pre>
+</article>
+<article><h3>インスタンスの自動導出</h3>
+<ul><li>型にまつわる一部の性質(型クラス)を自動で用意してくれる</li>
+<li>(オブジェクト指向のクラスとは違うので注意)</li>
+<li>対応するクラスは，<code>Eq,Ord,Show,Read,Bounded,Enum</code>
+</li>
+</ul>
+<pre><code class="sourceCode haskell"><span class="kw">data</span> <span class="dt">Vector</span> <span class="fu">=</span> <span class="dt">Vector</span> <span class="dt">Double</span> <span class="dt">Double</span>
+             <span class="kw">deriving</span> (<span class="kw">Show</span>)
+ghci<span class="fu">&gt;</span> <span class="fu">show</span> <span class="fu">$</span> <span class="dt">Vector</span> <span class="fl">1.1</span> <span class="fl">2.2</span>
+<span class="st">&quot;Vector 2.0 3.0&quot;</span></code></pre>
+</article>
+<article><h2>練習問題</h2>
+</article>
+<article><h3>練習問題1</h3>
+<ul><li><p>1-1. じゃんけんの手を表す型<code>Hand</code>
+と勝敗を表す型<code>VS</code>
+を作り，2つの<code>Hand</code>
+の勝敗を返す関数を作りなさい．<code>VS</code>
+は勝ち，負け，引き分けのいずれかの状態を表すとする．</p>
+</li>
+<li><p>1-2. RGB値(各256階調)を格納する色を表す型<code>Color</code>
+を作り，1つの<code>Color</code>
+の補色を計算する関数を作りなさい．補色の計算は，各RGB値から255を引いて絶対値を取ったものとする．</p>
+</li>
+</ul>
+<pre><code class="sourceCode haskell"><span class="ot">judge ::</span> <span class="dt">Hand</span> <span class="ot">-&gt;</span> <span class="dt">Hand</span> <span class="ot">-&gt;</span> <span class="dt">VS</span>
+<span class="ot">complementary ::</span> <span class="dt">Color</span> <span class="ot">-&gt;</span> <span class="dt">Color</span></code></pre>
+</article>
+<article><h3>練習問題2</h3>
+<ul><li>2-1. 2x2行列を表す型<code>TwoSquareMat</code>
+を作り，<code>TwoSquareMat</code>
+の転置行列を返す関数を作りなさい．</li>
+</ul>
+<pre><code class="sourceCode haskell"><span class="ot">transpose&#39; ::</span> <span class="dt">TwoSquareMat</span> <span class="ot">-&gt;</span> <span class="dt">TwoSquareMat</span></code></pre>
+<!-- ' -->
+
+
+</article>
+</section>
+</body>
+</html>
